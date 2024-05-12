@@ -1,25 +1,29 @@
 from datetime import timedelta
 from typing import Annotated
+from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from api.schemas.auth import Token, TokenData
-from api.schemas.user import UserCreateDTO, UserReadDTO
+from api.schemas.auth import Token
+from api.schemas.user import UserCreateDTO, UserReadDTO, UserUpdateDTO
 from api.dependencies import get_auth_service, get_user_service, auth_service
 from api.services.auth import AuthService
 from api.services.user import UserService
 from api.db import db_manager
 from sqlalchemy.ext.asyncio import AsyncSession
+from api.utils.role_checker import RoleChecker
 
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
 
-@router.post("", response_model=UserReadDTO)
+@router.post("", response_model=UserReadDTO, status_code=status.HTTP_201_CREATED)
 async def create_user(
     user_data: UserCreateDTO,
     service: UserService = Depends(get_user_service),
     session: AsyncSession = Depends(db_manager.get_async_session),
+    current_user: UserReadDTO = Depends(auth_service.get_current_user)
 ):
+    RoleChecker.is_superuser(current_user.role)
     user = await service.create_user(user_data, session)
     return user
 
@@ -37,17 +41,39 @@ async def login_for_access_token(
             detail="invalid username or password",
         )
     token = service.create_access_token(
-        data=({"id": user.login, "role": user.role}),
+        data=({"id": str(user.id), "role": user.role}),
         expires_delta=timedelta(minutes=60 * 8),
     )
     return {"access_token": token, "token_type": "bearer"}
 
 
-@router.get("", response_model=UserReadDTO)
+@router.get("", response_model=list[UserReadDTO])
 async def get_users(
     service: UserService = Depends(get_user_service),
     session: AsyncSession = Depends(db_manager.get_async_session),
-    current_user: int = Depends(auth_service.get_current_user),
+    current_user: UserReadDTO = Depends(auth_service.get_current_user),
 ):
-    users = await service.create_user(session)
+    users = await service.get_users(session)
     return users
+
+@router.put("/{id}", response_model=UserReadDTO, status_code=status.HTTP_201_CREATED)
+async def update_user(
+    user_data: UserUpdateDTO,
+    id: UUID,
+    service: UserService = Depends(get_user_service),
+    session: AsyncSession = Depends(db_manager.get_async_session),
+    current_user: UserReadDTO = Depends(auth_service.get_current_user),
+):  
+    RoleChecker.is_superuser(current_user.role)
+    updated_user = await service.update_user(user_data, id, session)
+    return updated_user
+
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_user(
+    id: UUID,
+    service: UserService = Depends(get_user_service),
+    session: AsyncSession = Depends(db_manager.get_async_session),
+    current_user: UserReadDTO = Depends(auth_service.get_current_user),
+):  
+    RoleChecker.is_superuser(current_user.role)
+    await service.delete_user(id, session)

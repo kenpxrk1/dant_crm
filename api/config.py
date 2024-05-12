@@ -2,6 +2,7 @@ from dataclasses import dataclass
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+from pydantic import EmailStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -77,5 +78,28 @@ class AuthConfig():
         return self.__ACCESS_TOKEN_EXPIRE_MINUTES
     
 auth_config = AuthConfig()
+
+@dataclass
+class SuperUserConfig:
+    def __init__(self):
+        self.__login: EmailStr = os.getenv("login")
+        self.__password: str = os.getenv("password")
+        self.__name: str = os.getenv("name")
+        self.__surname: str = os.getenv("surname")
+        self.__role: str = os.getenv("role")
+    
+    @property
+    def super_user_data(self):
+        """ returns super_user_data from .env """
+
+        return {
+            "login": self.__login,
+            "password": self.__password,
+            "name": self.__name,
+            "surname": self.__surname,
+            "role": self.__role
+        }
+        
+super_user = SuperUserConfig()
 
 

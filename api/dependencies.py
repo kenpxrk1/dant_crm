@@ -3,6 +3,7 @@ from api.services.auth import AuthService
 from api.services.user import UserService
 
 
+
 user_repo = UserRepository()
 
 user_service = UserService(user_repo)

@@ -26,8 +26,8 @@ class UserCreateDTO(UserBase):
     password: str
 
 
-class UserUpdateDTO(UserCreateDTO):
-    pass
+class UserUpdateDTO(UserBase):
+    role: UserRole
 
 
 class UserReadDTO(UserBase):

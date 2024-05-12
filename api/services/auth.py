@@ -1,11 +1,12 @@
 import datetime
-
+from api.db import db_manager
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from api.repositories.user import UserRepository
 from jose import jwt, JWTError
 from api.schemas.auth import TokenData
 from api.config import auth_config
+from api.schemas.user import UserReadDTO
 
 
 class AuthService:
@@ -41,15 +42,15 @@ class AuthService:
         
         return token_data
     
-    async def get_current_user(self, token: str = Depends(oauth2_scheme)):
+    async def get_current_user(self, token: str = Depends(oauth2_scheme), session = Depends(db_manager.get_async_session)):
             form_data_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                                     detail="Could not valid credentials", 
                                             headers={"WWW-Authenticate": "Bearer"})
             
             token = await self.verify_access_token(token, form_data_exception)
-
-            user = await self.repository.get_user(token.id)
-            return user
+            print(token.id)
+            user = await self.repo.find_one(token.id, session)
+            return UserReadDTO.model_validate(user, from_attributes=True)
     
     async def authenticate_user(self, username, password, session):
         user = await self.repo.authenticate(username, password, session)
