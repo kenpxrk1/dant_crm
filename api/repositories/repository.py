@@ -53,12 +53,12 @@ class SQLAlchemyRepository(AbstractRepository):
             return None
         return result
 
-    async def find_one(self, id: UUID, session: AsyncSession) -> ScalarResult | None:
+    async def find_one(self, id: UUID | int, session: AsyncSession) -> ScalarResult | None:
         select_query = select(self.model).where(self.model.id == id)
         result = await session.execute(select_query)
         return result.scalar_one_or_none()
 
-    async def update_one(self, request_data: dict, id: UUID, session: AsyncSession) -> ScalarResult | None:
+    async def update_one(self, request_data: dict, id: UUID | int, session: AsyncSession) -> ScalarResult | None:
         update_query = (
             update(self.model)
             .where(self.model.id == id)
@@ -69,7 +69,7 @@ class SQLAlchemyRepository(AbstractRepository):
         await session.commit()
         return result.scalar_one_or_none()
 
-    async def delete_one(self, id: UUID, session: AsyncSession) -> None:
+    async def delete_one(self, id: UUID | int, session: AsyncSession) -> None:
         delete_query = delete(self.model).where(self.model.id == id)
         await session.execute(delete_query)
         await session.commit()
