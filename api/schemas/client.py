@@ -11,11 +11,11 @@ RUSSIAN_ALPHABET_SYMBOLS = re.compile(r"^[а-яА-Яa\- ]+$")
 
 class ClientBaseSchema(BaseModel):
     fullname: str
-    date_of_birth: datetime.datetime
+    date_of_birth: datetime.date
     email: EmailStr
     phone_number: PhoneNumber
 
-    @field_validator('fullname', 'occupation')
+    @field_validator('fullname')
     def russian_symbols_validator(value):
         """ checks that value consist only
          russian, line, space symbols 
