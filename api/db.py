@@ -1,8 +1,9 @@
 from typing import AsyncGenerator
+from sqlalchemy import Index
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from api.config import db_settings
 from api.models.base import Base
-
+from api.models.days_off import DayOffModel
 
 class DBManager():
     def __init__(self):
@@ -20,6 +21,8 @@ class DBManager():
         async with self.async_engine.begin() as conn:
             # await conn.run_sync(Base.metadata.drop_all)
             await conn.run_sync(Base.metadata.create_all)
+            
+            
             
 
 db_manager = DBManager()

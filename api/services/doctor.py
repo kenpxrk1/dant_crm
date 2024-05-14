@@ -2,6 +2,7 @@ from uuid import UUID
 from fastapi import HTTPException, status
 from api.schemas.doctor import DoctorCreateDTO, DoctorReadDTO, DoctorUpdateDTO
 from api.repositories.doctor import DoctorRepository
+from api.schemas.days_off import CreateDaysOffDTO, ReadDaysOffDTO
 
 
 class DoctorService:
@@ -35,4 +36,11 @@ class DoctorService:
     
     async def delete_doctor(self, id: UUID, session) -> None:
         await self.repo.delete_one(id, session)
-        
+    
+    async def create_days_off(self, days_off_data: CreateDaysOffDTO, id: UUID, session) -> ReadDaysOffDTO:
+        days_off_data = days_off_data.model_dump()
+        created_days_off = await self.repo.create_days_off(days_off_data, id, session)
+        return ReadDaysOffDTO(
+            days_off_date=created_days_off,
+            doctor_id = id
+        )
