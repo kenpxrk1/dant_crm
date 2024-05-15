@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from api.db import db_manager
 from api.schemas.user import UserReadDTO
 from api.utils.role_checker import RoleChecker
+from api.schemas.appointments import AppointmentCreateDTO, AppointmentReadDTO
 
 
 router = APIRouter(prefix="/clients", tags=["Client"])
@@ -53,3 +54,14 @@ async def delete_clients(
     RoleChecker.is_superuser(current_user.role)
     await service.delete_client(id, session)
     return "success"
+
+
+@router.post("/appointments", status_code=status.HTTP_201_CREATED, response_model=AppointmentReadDTO)
+async def create_appointment(
+    appointment_data: AppointmentCreateDTO,
+    service: ClientService = Depends(get_client_service),
+    session: AsyncSession = Depends(db_manager.get_async_session),
+    current_user: UserReadDTO = Depends(auth_service.get_current_user)
+):
+    new_appointment = await service.create_appointment(appointment_data, session)
+    return new_appointment

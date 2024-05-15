@@ -1,7 +1,10 @@
+import datetime
 from uuid import UUID
 from fastapi import HTTPException, status
 from api.repositories.client import ClientRepository
 from api.schemas.client import ClientCreateDTO, ClientReadDTO, ClientUpdateDTO
+from api.schemas.appointments import AppointmentReadDTO, AppointmentCreateDTO
+
 
 class ClientService:
     def __init__(self, repo: ClientRepository):
@@ -37,3 +40,9 @@ class ClientService:
 
     async def delete_client(self, id: UUID, session) -> None:
         await self.repo.delete_one(id, session)
+
+
+    async def create_appointment(self, appointment_data: AppointmentCreateDTO, session) -> AppointmentReadDTO:
+        appointment_data = appointment_data.model_dump()
+        new_appmnt = await self.repo.create_appointment(appointment_data, session)
+        return AppointmentReadDTO.model_validate(new_appmnt, from_attributes=True)
