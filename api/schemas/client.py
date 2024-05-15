@@ -26,6 +26,11 @@ class ClientBaseSchema(BaseModel):
                 detail="Имя должно состоять из русских букв",
             )
         return value
+    
+    @field_validator('phone_number')
+    def cut_tel_symbols(value):
+        return str(value)[4:]
+        
 
 
 class ClientReadDTO(ClientBaseSchema):

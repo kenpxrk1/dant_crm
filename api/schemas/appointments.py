@@ -1,7 +1,7 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from uuid import UUID
 import datetime
-
+from pydantic_extra_types.phone_numbers import PhoneNumber
 
 class AppointmentBaseSchema(BaseModel):
     doctor_id: UUID
@@ -20,3 +20,14 @@ class AppointmentUpdateDTO(AppointmentCreateDTO):
 
 class AppointmentReadDTO(AppointmentBaseSchema):
     id: int
+
+
+class JoinedAppointmentsDTO(BaseModel):
+    
+    client_name: str
+    client_birthday: datetime.date
+    client_phone: PhoneNumber
+    doctor_name: str 
+    doctor_phone: PhoneNumber
+    appointment_date: datetime.date
+    appointment_time: datetime.time

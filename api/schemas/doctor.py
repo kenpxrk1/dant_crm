@@ -23,6 +23,10 @@ class DoctorBaseSchema(BaseModel):
                 detail="Имя должно состоять из русских букв",
             )
         return value
+    
+    @field_validator('phone_number')   # class PhoneNumber adding <tel:> symbols before user input. This method cuts them
+    def cut_tel_symbols(value):
+        return str(value)[4:]
 
 
 class DoctorCreateDTO(DoctorBaseSchema):
