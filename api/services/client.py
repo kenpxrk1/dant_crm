@@ -2,7 +2,7 @@ import datetime
 from uuid import UUID
 from fastapi import HTTPException, status
 from api.repositories.client import ClientRepository
-from api.schemas.client import ClientCreateDTO, ClientReadDTO, ClientUpdateDTO
+from api.schemas.client import ClientCreateDTO, ClientReadDTO, ClientUpdateDTO, CountClientDTO
 from api.schemas.appointments import AppointmentReadDTO, AppointmentCreateDTO
 
 
@@ -40,6 +40,13 @@ class ClientService:
 
     async def delete_client(self, id: UUID, session) -> None:
         await self.repo.delete_one(id, session)
+
+
+    async def count_clients(self, session) -> CountClientDTO:
+        num_of_clients = await self.repo.count_all(session)
+        return CountClientDTO(
+            num_of_clients=num_of_clients
+        )
 
 
     async def create_appointment(self, appointment_data: AppointmentCreateDTO, session) -> AppointmentReadDTO:

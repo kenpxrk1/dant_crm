@@ -1,7 +1,7 @@
 from uuid import UUID
 from fastapi import APIRouter, Depends, status
 from api.dependencies import get_client_service, ClientService, auth_service
-from api.schemas.client import ClientCreateDTO, ClientReadDTO, ClientUpdateDTO
+from api.schemas.client import ClientCreateDTO, ClientReadDTO, ClientUpdateDTO, CountClientDTO
 from sqlalchemy.ext.asyncio import AsyncSession
 from api.db import db_manager
 from api.schemas.user import UserReadDTO
@@ -54,6 +54,16 @@ async def delete_clients(
     RoleChecker.is_superuser(current_user.role)
     await service.delete_client(id, session)
     return "success"
+
+
+@router.get("/count", response_model=CountClientDTO, status_code=status.HTTP_200_OK)
+async def count_clients(
+    service: ClientService = Depends(get_client_service),
+    session: AsyncSession = Depends(db_manager.get_async_session),
+    current_user: UserReadDTO = Depends(auth_service.get_current_user)
+):
+    num_of_clients = await service.count_clients(session)
+    return num_of_clients
 
 
 @router.post("/appointments", status_code=status.HTTP_201_CREATED, response_model=AppointmentReadDTO)

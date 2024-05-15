@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import ScalarResult, insert, select, update, delete
+from sqlalchemy import Integer, ScalarResult, func, insert, select, update, delete
 from api.models.user import UserModel
 
 
@@ -73,3 +73,12 @@ class SQLAlchemyRepository(AbstractRepository):
         delete_query = delete(self.model).where(self.model.id == id)
         await session.execute(delete_query)
         await session.commit()
+
+    async def count_all(self, session: AsyncSession) -> ScalarResult:
+        rows_num_query = (
+            select(
+                func.count(self.model.id).cast(Integer).label("num_of_rows")
+            )
+        )
+        rows_num = await session.execute(rows_num_query)
+        return rows_num.scalar_one()

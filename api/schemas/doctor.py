@@ -35,3 +35,6 @@ class DoctorReadDTO(DoctorBaseSchema):
     id: UUID
     vacation: bool | None
 
+
+class CountDoctorDTO(BaseModel):
+    doctors_num: int

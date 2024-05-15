@@ -1,7 +1,7 @@
 from uuid import UUID
 from fastapi import APIRouter, Depends, status
 from api.dependencies import get_doctor_service, DoctorService, auth_service
-from api.schemas.doctor import DoctorReadDTO, DoctorCreateDTO, DoctorUpdateDTO
+from api.schemas.doctor import CountDoctorDTO, DoctorReadDTO, DoctorCreateDTO, DoctorUpdateDTO
 from sqlalchemy.ext.asyncio import AsyncSession
 from api.db import db_manager
 from api.schemas.user import UserReadDTO
@@ -53,6 +53,17 @@ async def delete_doctor(
 ):
     await service.delete_doctor(id, session)
     return "success"
+
+
+@router.get("/count", response_model=CountDoctorDTO, status_code=status.HTTP_200_OK)
+async def count_doctors(
+    service: DoctorService = Depends(get_doctor_service),
+    session: AsyncSession = Depends(db_manager.get_async_session),
+    current_user: UserReadDTO = Depends(auth_service.get_current_user)
+):
+    doctors_num = await service.count_doctors(session)
+    return doctors_num
+
 
 
 @router.post("/days-off/{id}", response_model=ReadDaysOffDTO, status_code=status.HTTP_201_CREATED)

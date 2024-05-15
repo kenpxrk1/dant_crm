@@ -3,6 +3,7 @@ from fastapi import HTTPException, status
 from api.schemas.doctor import DoctorCreateDTO, DoctorReadDTO, DoctorUpdateDTO
 from api.repositories.doctor import DoctorRepository
 from api.schemas.days_off import CreateDaysOffDTO, ReadDaysOffDTO
+from api.schemas.doctor import CountDoctorDTO
 
 
 class DoctorService:
@@ -36,6 +37,14 @@ class DoctorService:
     
     async def delete_doctor(self, id: UUID, session) -> None:
         await self.repo.delete_one(id, session)
+
+
+    async def count_doctors(self, session) -> CountDoctorDTO:
+        doctors_num = await self.repo.count_all(session)
+        return CountDoctorDTO(
+            doctors_num=doctors_num
+        )
+
     
     async def create_days_off(self, days_off_data: CreateDaysOffDTO, id: UUID, session) -> ReadDaysOffDTO:
         days_off_data = days_off_data.model_dump()

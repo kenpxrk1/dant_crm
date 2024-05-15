@@ -1,4 +1,4 @@
-from sqlalchemy import ScalarResult, insert
+from sqlalchemy import Integer, ScalarResult, func, insert, select
 from api.models.client import ClientModel
 from api.repositories.repository import SQLAlchemyRepository
 from api.schemas.appointments import AppointmentReadDTO
@@ -9,6 +9,7 @@ from api.models.appointments import AppointmentModel
 class ClientRepository(SQLAlchemyRepository):
     
     model = ClientModel
+    
 
     async def create_appointment(self, appointment_data: dict, session: AsyncSession) -> ScalarResult:
         appmnt_insert_query = insert(AppointmentModel).values(**appointment_data).returning(AppointmentModel)

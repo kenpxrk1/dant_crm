@@ -40,3 +40,6 @@ class ClientCreateDTO(ClientBaseSchema):
 class ClientUpdateDTO(ClientCreateDTO):
     pass 
 
+
+class CountClientDTO(BaseModel):
+    num_of_clients: int
