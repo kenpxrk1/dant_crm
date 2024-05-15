@@ -2,8 +2,12 @@ from uuid import UUID
 from .repository import SQLAlchemyRepository
 from sqlalchemy.ext.asyncio import AsyncSession
 from api.db import db_manager
-from sqlalchemy import ScalarResult, insert, select, update, delete
+from sqlalchemy.orm import aliased
+from sqlalchemy import ScalarResult, insert, select, update, delete, join
 from api.models.user import UserModel
+from api.models.client import ClientModel
+from api.models.appointments import AppointmentModel
+from api.models.doctor import DoctorModel
 from api.utils.hasher import HashingMixin
 from sqlalchemy.exc import IntegrityError
 
@@ -25,42 +29,6 @@ class UserRepository(SQLAlchemyRepository):
                 pass
 
 
-    # async def add_one(self, user_data: dict, session: AsyncSession) -> ScalarResult:
-    #     insert_user_query = insert(UserModel).values(**user_data).returning(UserModel)
-    #     user = await session.execute(insert_user_query)
-    #     await session.commit()
-    #     return user.scalar_one()
-
-    # async def find_all(self, session: AsyncSession) -> ScalarResult | None:
-    #     users_query = select(UserModel)
-    #     users = await session.execute(users_query)
-    #     users = users.scalars().all()
-    #     if users == None:
-    #         return None
-    #     return users
-
-    # async def find_one(self, id: UUID, session: AsyncSession) -> ScalarResult | None:
-    #     user_query = select(UserModel).where(UserModel.id == id)
-    #     user = await session.execute(user_query)
-    #     return user.scalar_one_or_none()
-
-    # async def update_one(self, user_data: dict, id: UUID, session: AsyncSession) -> ScalarResult | None:
-    #     update_user_query = (
-    #         update(UserModel)
-    #         .where(UserModel.id == id)
-    #         .values(**user_data)
-    #         .returning(UserModel)
-    #     )
-    #     updated_user = await session.execute(update_user_query)
-    #     # await session.refresh(UserModel)
-    #     await session.commit()
-    #     return updated_user.scalar_one_or_none()
-
-    # async def delete_one(self, id: UUID, session: AsyncSession) -> None:
-    #     delete_user_query = delete(UserModel).where(UserModel.id == id)
-    #     await session.execute(delete_user_query)
-    #     await session.commit()
-
     async def authenticate(self, username, password, session: AsyncSession) -> ScalarResult | None:
         stmt = select(self.model).where(username == self.model.login)
         user = await session.execute(stmt)
@@ -72,3 +40,39 @@ class UserRepository(SQLAlchemyRepository):
             return user
         else: 
             return None
+        
+
+    async def get_appointments(self, session: AsyncSession) -> ScalarResult:
+        """ SELECT 
+	clients.fullname AS "client", 
+	clients.date_of_birth,
+	email, 
+	clients.phone_number, 
+	doctors.fullname AS "doctor",
+	doctors.phone_number AS "doctors phone", 
+	appointment_date, 
+	appointment_time
+    FROM 
+    clients 
+    INNER JOIN appointments ON clients.id = appointments.client_id
+    INNER JOIN doctors ON appointments.doctor_id = doctors.id """
+        
+        c = aliased(ClientModel)
+        d = aliased(DoctorModel)
+        a = aliased(AppointmentModel)
+        select_query = (
+            select(
+                c.fullname.label("client_name"),
+                c.date_of_birth.label("client_birthday"),
+                c.phone_number.label("client_phone"),
+                d.fullname.label("doctor_name"),
+                d.phone_number.label("doctor_phone"),
+                a.appointment_date,
+                a.appointment_time,
+            )
+            .select_from(ClientModel)
+            .join(AppointmentModel, AppointmentModel.client_id == ClientModel.id)
+            .join(DoctorModel, AppointmentModel.doctor_id == DoctorModel.id)
+        )
+        res = await session.execute(select_query)
+        return res.all()

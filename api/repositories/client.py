@@ -18,17 +18,4 @@ class ClientRepository(SQLAlchemyRepository):
         return new_appmnt
 
 
-    async def get_appointments(self, session: AsyncSession) -> ScalarResult:
-        """ SELECT 
-	clients.fullname AS "client", 
-	clients.date_of_birth,
-	email, 
-	clients.phone_number, 
-	doctors.fullname AS "doctor",
-	doctors.phone_number AS "doctors phone", 
-	appointment_date, 
-	appointment_time
-    FROM 
-    clients 
-    INNER JOIN appointments ON clients.id = appointments.client_id
-    INNER JOIN doctors ON appointments.doctor_id = doctors.id """
+    

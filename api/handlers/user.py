@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from api.schemas.auth import Token
 from api.schemas.user import UserCreateDTO, UserReadDTO, UserUpdateDTO
+from api.schemas.appointments import JoinedAppointmentsDTO
 from api.dependencies import get_auth_service, get_user_service, auth_service
 from api.services.auth import AuthService
 from api.services.user import UserService
@@ -77,3 +78,13 @@ async def delete_user(
 ):  
     RoleChecker.is_superuser(current_user.role)
     await service.delete_user(id, session)
+
+
+@router.get("/appointments", status_code=status.HTTP_201_CREATED, response_model=list[JoinedAppointmentsDTO])
+async def get_appointments(
+    service: UserService = Depends(get_user_service),
+    session: AsyncSession = Depends(db_manager.get_async_session),
+    current_user: UserReadDTO = Depends(auth_service.get_current_user),
+):
+    appointments = await service.get_appointments(session)
+    return appointments
