@@ -11,11 +11,13 @@ class AppointmentModel(Base):
         UniqueConstraint(
             "doctor_id",
             "appointment_date",
+            "appointment_time",
             name="idx_doctor_datetime_unique"
         ),
         UniqueConstraint(
             "client_id",
             "appointment_date",
+            "appointment_time",
             name="idx_client_datetime_unique"
         )
     )

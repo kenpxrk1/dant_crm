@@ -1,6 +1,6 @@
 from uuid import UUID
-from fastapi import APIRouter, Depends, status
-from api.dependencies import get_client_service, ClientService, auth_service
+from fastapi import APIRouter, Depends, HTTPException, status
+from api.dependencies import get_client_service, ClientService, auth_service, doctor_service
 from api.schemas.client import ClientCreateDTO, ClientReadDTO, ClientUpdateDTO, CountClientDTO
 from sqlalchemy.ext.asyncio import AsyncSession
 from api.db import db_manager
@@ -73,5 +73,11 @@ async def create_appointment(
     session: AsyncSession = Depends(db_manager.get_async_session),
     current_user: UserReadDTO = Depends(auth_service.get_current_user)
 ):
+    if await doctor_service.is_day_off(appointment_data.appointment_date, appointment_data.doctor_id,
+                                 session):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="The doctor is going to rest that day"
+        )
     new_appointment = await service.create_appointment(appointment_data, session)
     return new_appointment

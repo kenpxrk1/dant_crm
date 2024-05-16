@@ -19,7 +19,7 @@ class DBManager():
     
     async def create_table(self):
         async with self.async_engine.begin() as conn:
-            # await conn.run_sync(Base.metadata.drop_all)
+            await conn.run_sync(Base.metadata.drop_all)
             await conn.run_sync(Base.metadata.create_all)
             
             

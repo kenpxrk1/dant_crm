@@ -6,7 +6,7 @@ from api.dependencies import user_service
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await db_manager.create_table()
+    # await db_manager.create_table()
     await user_service.create_super_user()
     yield
 

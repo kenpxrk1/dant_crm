@@ -1,3 +1,4 @@
+import datetime
 from uuid import UUID
 from fastapi import HTTPException, status
 from api.schemas.doctor import DoctorCreateDTO, DoctorReadDTO, DoctorUpdateDTO
@@ -53,3 +54,15 @@ class DoctorService:
             days_off_date=created_days_off,
             doctor_id = id
         )
+    
+
+    async def is_day_off(self, date: datetime.date, id: UUID | int, session) -> bool:
+        """ 
+        Returns True, if date param is in doctors days_off,
+        and False if its not in days_off.
+        """
+        days_off = await self.repo.get_days_off(date, id, session)
+        print(days_off)
+        if date in days_off:
+            return True
+        return False
