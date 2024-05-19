@@ -7,6 +7,7 @@ from api.db import db_manager
 from api.schemas.user import UserReadDTO
 from api.utils.role_checker import RoleChecker
 from api.schemas.appointments import AppointmentCreateDTO, AppointmentReadDTO
+from api.schemas.mail import CreateMail
 
 
 router = APIRouter(prefix="/clients", tags=["Client"])
@@ -81,3 +82,12 @@ async def create_appointment(
         )
     new_appointment = await service.create_appointment(appointment_data, session)
     return new_appointment
+
+@router.post("/mail_delivery", status_code=201)
+async def mail_delivery(
+    email_data: CreateMail,
+    service: ClientService = Depends(get_client_service),
+    session: AsyncSession = Depends(db_manager.get_async_session),
+    current_user: UserReadDTO = Depends(auth_service.get_current_user)
+):
+    await service.mail_delivery(email_data, session)

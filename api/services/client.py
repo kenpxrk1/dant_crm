@@ -4,6 +4,8 @@ from fastapi import HTTPException, status
 from api.repositories.client import ClientRepository
 from api.schemas.client import ClientCreateDTO, ClientReadDTO, ClientUpdateDTO, CountClientDTO
 from api.schemas.appointments import AppointmentReadDTO, AppointmentCreateDTO
+from api.schemas.mail import CreateMail
+from api.tasks.tasks import send_mail
 
 
 class ClientService:
@@ -53,3 +55,22 @@ class ClientService:
         appointment_data = appointment_data.model_dump()
         new_appmnt = await self.repo.create_appointment(appointment_data, session)
         return AppointmentReadDTO.model_validate(new_appmnt, from_attributes=True)
+    
+    async def get_client_email(self, session):
+        clients = await self.repo.find_all(session)
+        mails_lst = []
+        for client in clients:
+            mails_lst.append(client.email)
+        return mails_lst
+
+
+    async def mail_delivery(self, mail_data: CreateMail, session) -> None:
+        client_mails = await self.get_client_email(session)
+        for mail in client_mails:
+            try:
+                
+                send_mail.delay(email=mail, title=mail_data.title, content=mail_data.content)
+                print('я тут')
+            except:
+                continue
+

@@ -23,33 +23,11 @@ class DBConfig():
         self.__DB_NAME: str = os.getenv("DB_NAME")
 
     @property
-    def DB_HOST(self):
-        return self.__DB_HOST
-    
-    @property 
-    def DB_PORT(self):
-        return self.__DB_PORT
-    
-    @property
-    def DB_USER(self):        
-        return self.__DB_USER
-    
-    @property
-    def DB_PASS(self):
-        return self.__DB_PASS
-    
-    @property
-    def DB_NAME(self):
-        return self.__DB_NAME
-    
-
-
-    @property
     def DATABASE_URL(self) -> str:
         """
         Returns a string for bd connection
         """
-        return f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+        return f"postgresql+asyncpg://{self.__DB_USER}:{self.__DB_PASS}@{self.__DB_HOST}:{self.__DB_PORT}/{self.__DB_NAME}"
 
  
 db_settings = DBConfig() # DBConfig object. ! Must be single
@@ -102,4 +80,26 @@ class SuperUserConfig:
         
 super_user = SuperUserConfig()
 
+@dataclass
+class RabbitConfig:
+    def RABBITMQ_URL(self):
+        return 'amqp://guest:guest@localhost:15672//'
 
+rabbit_config = RabbitConfig()
+
+
+@dataclass
+class EmailConfig: 
+    def __init__(self):
+        self.__APP_EMAIL: EmailStr = os.getenv("APP_EMAIL")
+        self.__SECRET_EMAIL: str = os.getenv("SECRET_EMAIL")
+
+    @property
+    def APP_EMAIL(self):
+        return self.__APP_EMAIL
+    
+    @property
+    def SECRET_MAIL(self):
+        return self.__SECRET_EMAIL
+    
+email_config = EmailConfig()

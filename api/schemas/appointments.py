@@ -3,6 +3,7 @@ from uuid import UUID
 import datetime
 from pydantic_extra_types.phone_numbers import PhoneNumber
 
+
 class AppointmentBaseSchema(BaseModel):
     doctor_id: UUID
     client_id: UUID
@@ -11,7 +12,7 @@ class AppointmentBaseSchema(BaseModel):
 
 
 class AppointmentCreateDTO(AppointmentBaseSchema):
-    pass 
+    pass
 
 
 class AppointmentUpdateDTO(AppointmentCreateDTO):
@@ -23,11 +24,10 @@ class AppointmentReadDTO(AppointmentBaseSchema):
 
 
 class JoinedAppointmentsDTO(BaseModel):
-    
     client_name: str
     client_birthday: datetime.date
     client_phone: PhoneNumber
-    doctor_name: str 
+    doctor_name: str
     doctor_phone: PhoneNumber
     appointment_date: datetime.date
     appointment_time: datetime.time
