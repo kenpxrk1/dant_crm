@@ -4,7 +4,7 @@ from email.message import EmailMessage
 from api.config import email_config, rabbit_config
 
 celery_app = Celery(
-    broker='amqp://guest:guest@localhost:5672//',
+    broker=rabbit_config.RABBITMQ_URL,
     backend='rpc://',
 )
 
