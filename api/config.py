@@ -83,7 +83,7 @@ super_user = SuperUserConfig()
 @dataclass
 class RabbitConfig:
     def RABBITMQ_URL(self):
-        return 'amqp://guest:guest@localhost:15672//'
+        return 'amqp://guest:guest@localhost:5672//'
 
 rabbit_config = RabbitConfig()
 
