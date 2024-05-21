@@ -49,8 +49,9 @@ class UserService:
 
     async def get_appointments(self, session) -> list[JoinedAppointmentsDTO]:
         appointments = await self.repo.get_appointments(session)
-        print(appointments)
         return [
             JoinedAppointmentsDTO.model_validate(appointment, from_attributes=True)
             for appointment in appointments
         ]
+    
+    

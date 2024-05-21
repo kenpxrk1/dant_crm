@@ -1,6 +1,5 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from api.db import db_manager
 from api.handlers.routers import routers
 from api.dependencies import user_service
 

@@ -1,3 +1,4 @@
+import datetime
 from uuid import UUID
 from .repository import SQLAlchemyRepository
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -70,9 +71,15 @@ class UserRepository(SQLAlchemyRepository):
                 a.appointment_date,
                 a.appointment_time,
             )
-            .select_from(ClientModel)
-            .join(AppointmentModel, AppointmentModel.client_id == ClientModel.id)
-            .join(DoctorModel, AppointmentModel.doctor_id == DoctorModel.id)
+            .select_from(c)
+            .join(a, a.client_id == c.id)
+            .join(d, a.doctor_id == d.id)
         )
         res = await session.execute(select_query)
         return res.all()
+    
+
+    async def get_appointments_stats_for_doctors(self, period: datetime.date | None, session):
+        """ надо получить каждого врача и количество записей к нему """
+        
+
