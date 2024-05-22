@@ -1,3 +1,4 @@
+import datetime
 from uuid import UUID
 from fastapi import HTTPException, status
 from api.repositories.user import UserRepository
@@ -5,6 +6,10 @@ from api.schemas.user import UserCreateDTO, UserReadDTO, UserUpdateDTO
 from api.schemas.appointments import JoinedAppointmentsDTO
 from api.utils.hasher import HashingMixin
 from api.config import super_user
+from api.schemas.appointments import (
+    AppointmentsByConditionInput,
+    AppointmentsByOccupation,
+)
 
 
 class UserService:
@@ -53,5 +58,13 @@ class UserService:
             JoinedAppointmentsDTO.model_validate(appointment, from_attributes=True)
             for appointment in appointments
         ]
-    
-    
+
+    async def get_appointments_stats_for_doctors_by_occupation(
+        self, request: AppointmentsByConditionInput, session
+    ) -> AppointmentsByOccupation:
+       date_to, date_from = request.period_to, request.period_from
+       appointments = await self.repo.get_appointments_stats_for_doctors_by_occupation(date_to, date_from, session) 
+       return [
+           AppointmentsByOccupation.model_validate(appointment, from_attributes=True)
+           for appointment in appointments
+       ]

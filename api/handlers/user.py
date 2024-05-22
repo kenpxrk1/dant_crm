@@ -1,11 +1,12 @@
 from datetime import timedelta
+import datetime
 from typing import Annotated
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from api.schemas.auth import Token
 from api.schemas.user import UserCreateDTO, UserReadDTO, UserUpdateDTO
-from api.schemas.appointments import JoinedAppointmentsDTO
+from api.schemas.appointments import JoinedAppointmentsDTO, AppointmentsByOccupation, AppointmentsByConditionInput
 from api.dependencies import get_auth_service, get_user_service, auth_service, doctor_service
 from api.services.auth import AuthService
 from api.services.user import UserService
@@ -87,4 +88,20 @@ async def get_appointments(
     current_user: UserReadDTO = Depends(auth_service.get_current_user),
 ): 
     appointments = await service.get_appointments(session)
+    return appointments
+
+
+@router.get("/appointments/report/occupation/}", status_code=status.HTTP_201_CREATED, response_model=list[AppointmentsByOccupation])
+async def get_appointments_stats_for_doctors_by_occupation(
+    date_from: datetime.date,
+    date_to: datetime.date,
+    service: UserService = Depends(get_user_service),
+    session: AsyncSession = Depends(db_manager.get_async_session),
+    current_user: UserReadDTO = Depends(auth_service.get_current_user)
+):
+    request_data = AppointmentsByConditionInput(
+        period_from=date_from,
+        period_to=date_to
+    )
+    appointments = await service.get_appointments_stats_for_doctors_by_occupation(request_data, session)
     return appointments
