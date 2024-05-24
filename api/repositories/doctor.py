@@ -10,17 +10,16 @@ from sqlalchemy.exc import IntegrityError
 
 
 class DoctorRepository(SQLAlchemyRepository):
-    
+
     model = DoctorModel
 
-    async def create_days_off(self, days_off_data: dict, id: int | UUID, session: AsyncSession) -> list[datetime.date]:
+    async def create_days_off(
+        self, days_off_data: dict, id: int | UUID, session: AsyncSession
+    ) -> list[datetime.date]:
         new_days_off = []
         for day in days_off_data["days_off_date"]:
             try:
-                new_day_off = DayOffModel(
-                    doctor_id = id,
-                    days_off_date = day
-                )
+                new_day_off = DayOffModel(doctor_id=id, days_off_date=day)
                 session.add(new_day_off)
                 await session.flush()
                 await session.commit()
@@ -29,12 +28,11 @@ class DoctorRepository(SQLAlchemyRepository):
             new_days_off.append(new_day_off.days_off_date)
         return new_days_off
 
-
-    async def get_days_off(self, date: datetime.date, id: UUID | int, session: AsyncSession) -> ScalarResult:
-        days_query = select(DayOffModel.days_off_date).where(DayOffModel.doctor_id == id)
+    async def get_days_off(
+        self, date: datetime.date, id: UUID | int, session: AsyncSession
+    ) -> ScalarResult:
+        days_query = select(DayOffModel.days_off_date).where(
+            DayOffModel.doctor_id == id
+        )
         days_off = await session.execute(days_query)
         return days_off.scalars().all()
-    
-
-
-        

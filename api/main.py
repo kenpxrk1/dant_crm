@@ -1,7 +1,8 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from api.handlers.routers import routers
-from api.dependencies import user_service
+from api.dependencies import user_service, user_repo
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -10,10 +11,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(
-    title="CRM DANTIST",
-    lifespan=lifespan
-)
+app = FastAPI(title="CRM DANTIST", lifespan=lifespan)
 
 for router in routers:
     app.include_router(router)

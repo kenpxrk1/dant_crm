@@ -7,10 +7,8 @@ from sqlalchemy import text
 
 
 class UserRole(str, enum.Enum):
-    admin = 'admin'
-    super_user = 'super_user'
-
-    
+    admin = "admin"
+    super_user = "super_user"
 
 
 class UserModel(Base):
@@ -25,5 +23,3 @@ class UserModel(Base):
     created_at: Mapped[datetime.datetime] = mapped_column(
         server_default=text("TIMEZONE('utc', now())")
     )
-    
-

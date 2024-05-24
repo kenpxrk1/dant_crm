@@ -34,11 +34,10 @@ class JoinedAppointmentsDTO(BaseModel):
 
 
 class AppointmentsByOccupation(BaseModel):
-    occupation: str 
+    occupation: str
     appointments_counter: int
 
 
 class AppointmentsByConditionInput(BaseModel):
     period_from: datetime.date
-    period_to: datetime.date 
-    
+    period_to: datetime.date

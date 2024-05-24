@@ -6,8 +6,17 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from api.schemas.auth import Token
 from api.schemas.user import UserCreateDTO, UserReadDTO, UserUpdateDTO
-from api.schemas.appointments import JoinedAppointmentsDTO, AppointmentsByOccupation, AppointmentsByConditionInput
-from api.dependencies import get_auth_service, get_user_service, auth_service, doctor_service
+from api.schemas.appointments import (
+    JoinedAppointmentsDTO,
+    AppointmentsByOccupation,
+    AppointmentsByConditionInput,
+)
+from api.dependencies import (
+    get_auth_service,
+    get_user_service,
+    auth_service,
+    doctor_service,
+)
 from api.services.auth import AuthService
 from api.services.user import UserService
 from api.db import db_manager
@@ -23,7 +32,7 @@ async def create_user(
     user_data: UserCreateDTO,
     service: UserService = Depends(get_user_service),
     session: AsyncSession = Depends(db_manager.get_async_session),
-    current_user: UserReadDTO = Depends(auth_service.get_current_user)
+    current_user: UserReadDTO = Depends(auth_service.get_current_user),
 ):
     RoleChecker.is_superuser(current_user.role)
     user = await service.create_user(user_data, session)
@@ -34,9 +43,11 @@ async def create_user(
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     service: AuthService = Depends(get_auth_service),
-    session: AsyncSession = Depends(db_manager.get_async_session)
+    session: AsyncSession = Depends(db_manager.get_async_session),
 ):
-    user = await service.authenticate_user(form_data.username, form_data.password, session)
+    user = await service.authenticate_user(
+        form_data.username, form_data.password, session
+    )
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -58,6 +69,7 @@ async def get_users(
     users = await service.get_users(session)
     return users
 
+
 @router.put("/{id}", response_model=UserReadDTO, status_code=status.HTTP_201_CREATED)
 async def update_user(
     user_data: UserUpdateDTO,
@@ -65,10 +77,11 @@ async def update_user(
     service: UserService = Depends(get_user_service),
     session: AsyncSession = Depends(db_manager.get_async_session),
     current_user: UserReadDTO = Depends(auth_service.get_current_user),
-):  
+):
     RoleChecker.is_superuser(current_user.role)
     updated_user = await service.update_user(user_data, id, session)
     return updated_user
+
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user(
@@ -76,32 +89,6 @@ async def delete_user(
     service: UserService = Depends(get_user_service),
     session: AsyncSession = Depends(db_manager.get_async_session),
     current_user: UserReadDTO = Depends(auth_service.get_current_user),
-):  
+):
     RoleChecker.is_superuser(current_user.role)
     await service.delete_user(id, session)
-
-
-@router.get("/appointments", status_code=status.HTTP_201_CREATED, response_model=list[JoinedAppointmentsDTO])
-async def get_appointments(
-    service: UserService = Depends(get_user_service),
-    session: AsyncSession = Depends(db_manager.get_async_session),
-    current_user: UserReadDTO = Depends(auth_service.get_current_user),
-): 
-    appointments = await service.get_appointments(session)
-    return appointments
-
-
-@router.get("/appointments/report/occupation/}", status_code=status.HTTP_201_CREATED, response_model=list[AppointmentsByOccupation])
-async def get_appointments_stats_for_doctors_by_occupation(
-    date_from: datetime.date,
-    date_to: datetime.date,
-    service: UserService = Depends(get_user_service),
-    session: AsyncSession = Depends(db_manager.get_async_session),
-    current_user: UserReadDTO = Depends(auth_service.get_current_user)
-):
-    request_data = AppointmentsByConditionInput(
-        period_from=date_from,
-        period_to=date_to
-    )
-    appointments = await service.get_appointments_stats_for_doctors_by_occupation(request_data, session)
-    return appointments
