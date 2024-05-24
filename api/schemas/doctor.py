@@ -46,3 +46,9 @@ class DoctorReadDTO(DoctorBaseSchema):
 
 class CountDoctorDTO(BaseModel):
     doctors_num: int
+
+
+class SearchDoctorDTO(BaseModel):
+    id: UUID
+    fullname: str
+    

@@ -1,7 +1,7 @@
 import datetime
 from uuid import UUID
 from fastapi import HTTPException, status
-from api.schemas.doctor import DoctorCreateDTO, DoctorReadDTO, DoctorUpdateDTO
+from api.schemas.doctor import DoctorCreateDTO, DoctorReadDTO, DoctorUpdateDTO, SearchDoctorDTO
 from api.repositories.doctor import DoctorRepository
 from api.schemas.days_off import CreateDaysOffDTO, ReadDaysOffDTO
 from api.schemas.doctor import CountDoctorDTO
@@ -62,3 +62,11 @@ class DoctorService:
         if date in days_off:
             return True
         return False
+
+    async def search_doctor_by_fio(self, fullname: str, session) -> list[SearchDoctorDTO]:
+        tuple_doctors = await self.repo.search_by_fio(fullname, session)
+        print(tuple_doctors)
+        return [
+            SearchDoctorDTO.model_validate(tuple_doctor, from_attributes=True)
+            for tuple_doctor in tuple_doctors
+        ]
