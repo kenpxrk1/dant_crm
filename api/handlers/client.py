@@ -11,6 +11,7 @@ from api.schemas.client import (
     ClientReadDTO,
     ClientUpdateDTO,
     CountClientDTO,
+    SearchClientDTO
 )
 from sqlalchemy.ext.asyncio import AsyncSession
 from api.db import db_manager
@@ -103,3 +104,14 @@ async def mail_delivery(
     current_user: UserReadDTO = Depends(auth_service.get_current_user),
 ):
     await service.mail_delivery(email_data, session)
+
+
+@router.get("/search/{fullname}", response_model=list[SearchClientDTO])
+async def search_by_fio(
+    fullname: str,
+    service: ClientService = Depends(get_client_service),
+    session: AsyncSession = Depends(db_manager.get_async_session),
+    current_user: UserReadDTO = Depends(auth_service.get_current_user),
+):
+    clients = await service.search_client_by_fio(fullname, session)
+    return clients

@@ -7,6 +7,7 @@ from api.schemas.client import (
     ClientReadDTO,
     ClientUpdateDTO,
     CountClientDTO,
+    SearchClientDTO,
 )
 from api.schemas.appointments import AppointmentReadDTO, AppointmentCreateDTO
 from api.schemas.mail import CreateMail
@@ -73,3 +74,11 @@ class ClientService:
                 )
             except:
                 continue
+    
+    async def search_client_by_fio(self, fullname: str, session) -> list[SearchClientDTO]:
+        tuple_clients = await self.repo.search_by_fio(fullname, session)
+        print(tuple_clients)
+        return [
+            SearchClientDTO.model_validate(client, from_attributes=True)
+            for client in tuple_clients
+        ]

@@ -8,8 +8,17 @@ from sqlalchemy.exc import IntegrityError
 
 
 class ClientRepository(SQLAlchemyRepository):
-    
-    model = ClientModel
-    
 
-    
+    model = ClientModel
+
+    async def search_by_fio(
+        self,
+        fullname: str,
+        session: AsyncSession,
+    ) -> ScalarResult:
+        search_query = select(self.model).where(
+            self.model.fullname.ilike(f"%{fullname}%")
+        )
+        search_query = await session.execute(search_query)
+        search_result = search_query.scalars().all()
+        return search_result
