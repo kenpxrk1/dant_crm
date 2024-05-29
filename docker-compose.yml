@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+
+  db:
+
+    image: postgres:15
+
+    container_name: 'db'
+
+    env_file:
+      - .env-prod 
+
+    environment:
+        POSTGRES_DB: ${POSTGRES_DB}
+        POSTGRES_USER: ${POSTGRES_USER}
+        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+    command: -p 1221
+  
+    expose:
+      - 1221
+    
+    volumes:
+      - .postgres:/var/lib/postgresql/data
+
+    restart: always
+
+
+
+  app:
+    container_name: 'app'
+
+    build:
+      context: .
+
+    depends_on:
+      - db
+      - rabbit
+
+    env_file:
+      - .env-prod
+
+    command: bash -c "alembic upgrade head; uvicorn api.main:app --host 0.0.0.0 --port 8000"
+
+    restart: always
+
+    ports:
+      - 9999:8000
+
+  rabbit:
+    container_name: "rabbit"
+
+    image: rabbitmq:3-management
+
+    ports:
+          - "5672:5672"
+          - "15672:15672"
+    
+    restart: always
+
+
+  celery_worker:
+    container_name: celeryworker
+
+    build:
+      context: .
+
+    env_file:
+      - .env
+
+    depends_on:
+      - rabbit
+      - db
+      - app
+
+
+    command: ["celery", "-A", "api.tasks.tasks:celery_app", "worker", "--loglevel=info", "--concurrency", "1", "-P", "solo"]
+
+ 

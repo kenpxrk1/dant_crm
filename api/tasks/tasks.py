@@ -3,13 +3,13 @@ from email.mime.base import MIMEBase
 from celery import Celery
 import smtplib
 from email.message import EmailMessage
-
+from api.config import rabbit_config
 from pydantic import EmailStr
 from api.config import email_config
 
 celery_app = Celery(
-    broker="amqp://guest:guest@localhost:5672//",
-    backend="rpc://",
+    broker=rabbit_config.RABBITMQ_URL,
+    backend='rpc://',
 )
 
 

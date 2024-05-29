@@ -5,7 +5,9 @@ from dotenv import load_dotenv
 from pydantic import EmailStr
 
 
-dotenv_path = Path(__file__).parent.parent.joinpath(".env")
+
+
+dotenv_path = Path(__file__).parent.parent.joinpath(".env-prod")
 if os.path.exists(dotenv_path):
     load_dotenv(dotenv_path)
 
@@ -86,9 +88,12 @@ super_user = SuperUserConfig()
 
 @dataclass
 class RabbitConfig:
-    def RABBITMQ_URL(self):
-        return "amqp://guest:guest@localhost:5672//"
+    def __init__(self):
+        self.__RABBIT_URL = os.getenv("RABBIT_URL")
 
+    @property
+    def RABBITMQ_URL(self):
+        return self.__RABBIT_URL
 
 rabbit_config = RabbitConfig()
 
