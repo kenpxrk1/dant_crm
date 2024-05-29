@@ -77,7 +77,6 @@ class ClientService:
     
     async def search_client_by_fio(self, fullname: str, session) -> list[SearchClientDTO]:
         tuple_clients = await self.repo.search_by_fio(fullname, session)
-        print(tuple_clients)
         return [
             SearchClientDTO.model_validate(client, from_attributes=True)
             for client in tuple_clients

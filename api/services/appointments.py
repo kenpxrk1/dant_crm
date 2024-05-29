@@ -54,9 +54,10 @@ class AppointmentsService:
         appointments_df = pd.DataFrame(appointments_tuple)
         file_path = appointments_pdf.generate_path()
         pdf_data = appointments_pdf.create_report(file_path, appointments_df)
-        send_appointments_report(
+        send_appointments_report.delay(
             email=email,
             title="Отчет по записям в нашей клинике",
             pdf_buffer=pdf_data["buffer"],
             pdf_filename=pdf_data["file_name"],
         )
+

@@ -91,3 +91,9 @@ class AppointmentsRepository:
             return new_appmnt
         except IntegrityError:
             raise HTTPException(status_code=400, detail="Invalid client or doctor id")
+
+    async def delete_appointment(
+            self,
+            session: AsyncSession
+    ) -> None:
+        ...
