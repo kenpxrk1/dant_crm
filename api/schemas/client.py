@@ -48,3 +48,9 @@ class ClientUpdateDTO(ClientCreateDTO):
 
 class CountClientDTO(BaseModel):
     num_of_clients: int
+
+
+class SearchClientDTO(BaseModel):
+    id: UUID 
+    fullname: str 
+    date_of_birth: datetime.date

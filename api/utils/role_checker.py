@@ -8,6 +8,5 @@ class RoleChecker:
         if role != "super_user":
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="u dont have rights for this action"
+                detail="u dont have rights for this action",
             )
-        

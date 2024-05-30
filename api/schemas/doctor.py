@@ -12,10 +12,10 @@ class DoctorBaseSchema(BaseModel):
     occupation: str
     phone_number: PhoneNumber
 
-    @field_validator('fullname', 'occupation')
+    @field_validator("fullname", "occupation")
     def russian_symbols_validator(value):
-        """ checks that value consist only
-         russian, line, space symbols 
+        """checks that value consist only
+        russian, line, space symbols
         """
         if not RUSSIAN_ALPHABET_SYMBOLS.match(value):
             raise HTTPException(
@@ -23,17 +23,21 @@ class DoctorBaseSchema(BaseModel):
                 detail="Имя должно состоять из русских букв",
             )
         return value
-    
-    @field_validator('phone_number')   # class PhoneNumber adding <tel:> symbols before user input. This method cuts them
+
+    @field_validator(
+        "phone_number"
+    )  # class PhoneNumber adding <tel:> symbols before user input. This method cuts them
     def cut_tel_symbols(value):
         return str(value)[4:]
 
 
 class DoctorCreateDTO(DoctorBaseSchema):
-    pass 
+    pass
+
 
 class DoctorUpdateDTO(DoctorBaseSchema):
     pass
+
 
 class DoctorReadDTO(DoctorBaseSchema):
     id: UUID
@@ -42,3 +46,9 @@ class DoctorReadDTO(DoctorBaseSchema):
 
 class CountDoctorDTO(BaseModel):
     doctors_num: int
+
+
+class SearchDoctorDTO(BaseModel):
+    id: UUID
+    fullname: str
+    

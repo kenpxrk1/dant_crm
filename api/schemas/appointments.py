@@ -31,3 +31,13 @@ class JoinedAppointmentsDTO(BaseModel):
     doctor_phone: PhoneNumber
     appointment_date: datetime.date
     appointment_time: datetime.time
+
+
+class AppointmentsByOccupation(BaseModel):
+    occupation: str
+    appointments_counter: int
+
+
+class AppointmentsByConditionInput(BaseModel):
+    period_from: datetime.date
+    period_to: datetime.date

@@ -8,21 +8,17 @@ from sqlalchemy.exc import IntegrityError
 
 
 class ClientRepository(SQLAlchemyRepository):
-    
+
     model = ClientModel
-    
 
-    async def create_appointment(self, appointment_data: dict, session: AsyncSession) -> ScalarResult:
-        try:
-            appmnt_insert_query = insert(AppointmentModel).values(**appointment_data).returning(AppointmentModel)
-            new_appmnt = await session.execute(appmnt_insert_query)
-            await session.commit()
-            new_appmnt = new_appmnt.scalar_one()
-            return new_appmnt
-        except IntegrityError:
-            raise HTTPException(
-                status_code=400,
-                detail="Invalid client or doctor id"
-            )
-
-    
+    async def search_by_fio(
+        self,
+        fullname: str,
+        session: AsyncSession,
+    ) -> ScalarResult:
+        search_query = select(self.model).where(
+            self.model.fullname.ilike(f"%{fullname}%")
+        )
+        search_query = await session.execute(search_query)
+        search_result = search_query.scalars().all()
+        return search_result

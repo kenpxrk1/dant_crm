@@ -8,37 +8,37 @@ from api.models.user import UserModel
 class AbstractRepository(ABC):
     @abstractmethod
     async def add_one():
-        """ Creates new row in database """
+        """Creates new row in database"""
         raise NotImplementedError
 
     @abstractmethod
     async def find_all():
-        """ Returns all rows from database or None if its no one row in db """
+        """Returns all rows from database or None if its no one row in db"""
         raise NotImplementedError
 
     @abstractmethod
     async def find_one():
-        """ Returns one row from database or error if query object doesnt exist"""
+        """Returns one row from database or error if query object doesnt exist"""
         raise NotImplementedError
 
     @abstractmethod
     async def update_one():
-        """ 
-        Updated one row from database and returns new object or error 
-        if query object doesnt exist 
+        """
+        Updated one row from database and returns new object or error
+        if query object doesnt exist
         """
         raise NotImplementedError
 
     @abstractmethod
     async def delete_one():
-        """ Deletes one row from database and returns 200 status or error if query object doesnt exist """
+        """Deletes one row from database and returns 200 status or error if query object doesnt exist"""
         raise NotImplementedError
 
 
 class SQLAlchemyRepository(AbstractRepository):
 
     model = None
-    
+
     async def add_one(self, request_data: dict, session: AsyncSession) -> ScalarResult:
         insert_query = insert(self.model).values(**request_data).returning(self.model)
         result = await session.execute(insert_query)
@@ -53,12 +53,16 @@ class SQLAlchemyRepository(AbstractRepository):
             return None
         return result
 
-    async def find_one(self, id: UUID | int, session: AsyncSession) -> ScalarResult | None:
+    async def find_one(
+        self, id: UUID | int, session: AsyncSession
+    ) -> ScalarResult | None:
         select_query = select(self.model).where(self.model.id == id)
         result = await session.execute(select_query)
         return result.scalar_one_or_none()
 
-    async def update_one(self, request_data: dict, id: UUID | int, session: AsyncSession) -> ScalarResult | None:
+    async def update_one(
+        self, request_data: dict, id: UUID | int, session: AsyncSession
+    ) -> ScalarResult | None:
         update_query = (
             update(self.model)
             .where(self.model.id == id)
@@ -75,10 +79,8 @@ class SQLAlchemyRepository(AbstractRepository):
         await session.commit()
 
     async def count_all(self, session: AsyncSession) -> ScalarResult:
-        rows_num_query = (
-            select(
-                func.count(self.model.id).cast(Integer).label("num_of_rows")
-            )
+        rows_num_query = select(
+            func.count(self.model.id).cast(Integer).label("num_of_rows")
         )
         rows_num = await session.execute(rows_num_query)
         return rows_num.scalar_one()

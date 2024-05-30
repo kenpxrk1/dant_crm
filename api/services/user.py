@@ -1,10 +1,17 @@
+import datetime
+import pandas as pd
 from uuid import UUID
 from fastapi import HTTPException, status
 from api.repositories.user import UserRepository
 from api.schemas.user import UserCreateDTO, UserReadDTO, UserUpdateDTO
-from api.schemas.appointments import JoinedAppointmentsDTO
 from api.utils.hasher import HashingMixin
 from api.config import super_user
+from api.schemas.appointments import (
+    AppointmentsByConditionInput,
+    AppointmentsByOccupation,
+    JoinedAppointmentsDTO,
+)
+from api.utils.pdf_report import appointments_pdf
 
 
 class UserService:
@@ -46,11 +53,3 @@ class UserService:
 
     async def delete_user(self, id: UUID, session) -> None:
         await self.repo.delete_one(id, session)
-
-    async def get_appointments(self, session) -> list[JoinedAppointmentsDTO]:
-        appointments = await self.repo.get_appointments(session)
-        print(appointments)
-        return [
-            JoinedAppointmentsDTO.model_validate(appointment, from_attributes=True)
-            for appointment in appointments
-        ]

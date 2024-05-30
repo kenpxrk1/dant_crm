@@ -14,7 +14,7 @@ class UserBase(BaseModel):
 
     @field_validator("name", "surname")
     def russian_symbols_validator(value):
-        """checks that value consist only russian letters 
+        """checks that value consist only russian letters
         and line
         """
 
