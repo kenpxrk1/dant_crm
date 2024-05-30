@@ -89,6 +89,7 @@ class RabbitConfig:
     def RABBITMQ_URL(self):
         return self.__RABBIT_URL
 
+
 rabbit_config = RabbitConfig()
 
 
