@@ -80,3 +80,14 @@ async def get_appointments_stats_for_doctors_by_occupation(
         request_data, session
     )
     return appointments
+
+
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_appointment(
+    id: int, 
+    service: AppointmentsService = Depends(get_appointments_service),
+    session: AsyncSession = Depends(db_manager.get_async_session),
+    current_user: UserReadDTO = Depends(auth_service.get_current_user),
+
+):
+    await service.delete_appointment(id, session)

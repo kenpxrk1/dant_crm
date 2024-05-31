@@ -24,6 +24,7 @@ class AppointmentReadDTO(AppointmentBaseSchema):
 
 
 class JoinedAppointmentsDTO(BaseModel):
+    id: int
     client_name: str
     client_birthday: datetime.date
     client_phone: PhoneNumber

@@ -36,6 +36,7 @@ class AppointmentsRepository:
         a = aliased(AppointmentModel)
         select_query = (
             select(
+                a.id,
                 c.fullname.label("client_name"),
                 c.date_of_birth.label("client_birthday"),
                 c.phone_number.label("client_phone"),
@@ -94,6 +95,11 @@ class AppointmentsRepository:
 
     async def delete_appointment(
             self,
+            id: int,
             session: AsyncSession
     ) -> None:
-        ...
+        delete_stmt = (
+            delete(AppointmentModel).where(AppointmentModel.id == id)
+        )
+        await session.execute(delete_stmt)
+        await session.commit()

@@ -60,4 +60,8 @@ class AppointmentsService:
             pdf_buffer=pdf_data["buffer"],
             pdf_filename=pdf_data["file_name"],
         )
+    
+
+    async def delete_appointment(self, id: int, session):
+        await self.repo.delete_appointment(id, session)
 
