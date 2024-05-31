@@ -20,7 +20,7 @@
 
 Клонируйте репозиторий:
 ```sh
-$ git clone https://github.com/kenpxrk1/quiz-task-api
+$ git clone https://github.com/kenpxrk1/quiz-task-api](https://github.com/kenpxrk1/dant_crm
 ```
 
 Запустите приложение из корневой папки с помощью docker-compose:
