@@ -29,12 +29,6 @@ $ git clone https://github.com/kenpxrk1/quiz-task-api
 $ docker-compose docker_compose_app up 
 ```
 
-Для прогона тестов:
-
-```sh
-$ docker-compose docker_compose_tests up 
-```
-
 
 ### После установки и запуска, приложение станет доступно по адресу: 
 
