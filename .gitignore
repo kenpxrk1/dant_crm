@@ -160,3 +160,4 @@ cython_debug/
 #.idea/
 .env-prod
 .DS_Store
+.postgres
