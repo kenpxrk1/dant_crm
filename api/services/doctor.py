@@ -3,7 +3,6 @@ from uuid import UUID
 from fastapi import HTTPException, status
 from api.schemas.doctor import DoctorCreateDTO, DoctorReadDTO, DoctorUpdateDTO, SearchDoctorDTO
 from api.repositories.doctor import DoctorRepository
-from api.schemas.days_off import CreateDaysOffDTO, ReadDaysOffDTO
 from api.schemas.doctor import CountDoctorDTO
 
 
@@ -45,27 +44,8 @@ class DoctorService:
         doctors_num = await self.repo.count_all(session)
         return CountDoctorDTO(doctors_num=doctors_num)
 
-    async def create_days_off(
-        self, days_off_data: CreateDaysOffDTO, id: UUID, session
-    ) -> ReadDaysOffDTO:
-        days_off_data = days_off_data.model_dump()
-        created_days_off = await self.repo.create_days_off(days_off_data, id, session)
-        return ReadDaysOffDTO(days_off_date=created_days_off, doctor_id=id)
-
-    async def is_day_off(self, date: datetime.date, id: UUID | int, session) -> bool:
-        """
-        Returns True, if date param is in doctors days_off,
-        and False if its not in days_off.
-        """
-        days_off = await self.repo.get_days_off(date, id, session)
-        print(days_off)
-        if date in days_off:
-            return True
-        return False
-
     async def search_doctor_by_fio(self, fullname: str, session) -> list[SearchDoctorDTO]:
         tuple_doctors = await self.repo.search_by_fio(fullname, session)
-        print(tuple_doctors)
         return [
             SearchDoctorDTO.model_validate(tuple_doctor, from_attributes=True)
             for tuple_doctor in tuple_doctors

@@ -1,9 +1,8 @@
 from typing import AsyncGenerator
-from sqlalchemy import Index
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from api.config import db_settings
 from api.models.base import Base
-from api.models.days_off import DayOffModel
+
 
 
 class DBManager:
