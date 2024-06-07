@@ -9,12 +9,12 @@ services:
     container_name: 'db'
 
     env_file:
-      - .env-prod 
+      - .env
 
-    environment:
-        POSTGRES_DB: 
-        POSTGRES_USER: 
-        POSTGRES_PASSWORD: 
+    environment: 
+      - POSTGRES_DB=${POSTGRES_DB} 
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
 
     command: -p 1221
   
