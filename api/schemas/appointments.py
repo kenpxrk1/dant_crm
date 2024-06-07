@@ -33,6 +33,10 @@ class JoinedAppointmentsDTO(BaseModel):
     appointment_date: datetime.date
     appointment_time: datetime.time
 
+    @field_validator(client_phone, doctor_phone)
+    def validate_phone_number(value):
+        return str(value)[4:]
+
 
 class AppointmentsByOccupation(BaseModel):
     occupation: str

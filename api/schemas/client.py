@@ -27,6 +27,23 @@ class ClientBaseSchema(BaseModel):
             )
         return value
     
+    @field_validator('date_of_birth')
+    def date_of_birth_validator(value: datetime.date):
+
+        """ Проверка корректности полученой даты рождения """
+
+        current_date =  datetime.date.today()
+        if value > current_date:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Дата рождения не может быть позже чем текущая дата."
+            )
+        if abs(int(current_date.year) - int(value.year)) >= 115: 
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Недопустимая дата рождения"
+            )
+    
     @field_validator('phone_number')
     def cut_tel_symbols(value):
         return str(value)[4:]
@@ -54,3 +71,21 @@ class SearchClientDTO(BaseModel):
     id: UUID 
     fullname: str 
     date_of_birth: datetime.date
+
+    @field_validator('date_of_birth')
+    def date_of_birth_validator(value: datetime.date):
+
+        """ Проверка корректности полученой даты рождения """
+
+        current_date =  datetime.date.today()
+        if value > current_date:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Дата рождения не может быть позже чем текущая дата."
+            )
+        if abs(current_date.year - value.year) >= 115: 
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Недопустимая дата рождения"
+            )
+        return value
