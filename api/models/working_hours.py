@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 from api.models.base import Base
 import datetime as dt
 import enum
@@ -14,6 +15,16 @@ class WeekDay(enum.Enum):
     FRIDAY = 5
     SATURDAY = 6
     SUNDAY = 7
+
+    def get_weekday_by_number(number):
+        try:
+            wd_object = WeekDay(number)
+            return wd_object.name
+        except ValueError:
+            raise HTTPException(
+                status_code=400,
+                detail="Такой день недели не существует"
+            )
 
 
 class WorkingHoursModel(Base):

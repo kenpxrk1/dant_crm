@@ -12,6 +12,7 @@ from api.models.client import ClientModel
 from api.models.appointments import AppointmentModel
 from api.models.doctor import DoctorModel
 from sqlalchemy.exc import IntegrityError
+from api.models.working_hours import WorkingHoursModel, WeekDay
 
 
 class AppointmentsRepository:
@@ -76,7 +77,7 @@ class AppointmentsRepository:
         )
         res = await session.execute(select_query)
         return res.all()
-
+    
     async def create_appointment(
         self, appointment_data: dict, session: AsyncSession
     ) -> ScalarResult:
@@ -103,3 +104,40 @@ class AppointmentsRepository:
         )
         await session.execute(delete_stmt)
         await session.commit()
+
+    async def can_schedule_appointment(self, doctor_id: UUID, appointment_date: datetime.date,
+                                       appointment_time: datetime.time, session: AsyncSession) -> bool:
+        one_hour = datetime.timedelta(hours=1)
+        start_time = datetime.datetime.combine(appointment_date, appointment_time)
+        end_time = start_time + one_hour
+
+        select_overlapping_appointments = (
+            select(AppointmentModel)
+            .where(
+                AppointmentModel.doctor_id == doctor_id,
+                AppointmentModel.appointment_date == appointment_date,
+                AppointmentModel.appointment_time >= (start_time - one_hour).time(),
+                AppointmentModel.appointment_time < end_time.time()
+                )
+        )
+        overlapping_appointments = await session.execute(select_overlapping_appointments)
+        overlapping_appointments = overlapping_appointments.all()
+        return len(overlapping_appointments) == 0
+    
+    async def is_doctor_workay(self, doctor_id: UUID, appointment_date: datetime.date, session: AsyncSession):
+
+        """ Если рабочий день возвращает True, 
+         в противном случае - False """
+
+        week_day_number = appointment_date.isoweekday()
+        week_day = WeekDay.get_weekday_by_number(week_day_number)
+        select_query = (
+            select(WorkingHoursModel)
+            .where(
+                WorkingHoursModel.doctor_id == doctor_id, 
+                WorkingHoursModel.day_of_week == week_day
+                )
+        )
+        result = await session.execute(select_query)
+        result = result.all()
+        return len(result) != 0

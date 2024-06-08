@@ -26,7 +26,27 @@ class AppointmentsService:
     async def create_appointment(
         self, appointment_data: AppointmentCreateDTO, session
     ) -> AppointmentReadDTO:
+        
         appointment_data = appointment_data.model_dump()
+        doctor_id = appointment_data['doctor_id']
+        appointment_date = appointment_data['appointment_date']
+        appointment_time = appointment_data['appointment_time']
+
+        is_time_locked = await self.repo.can_schedule_appointment(doctor_id, appointment_date, appointment_time, session)
+
+        if not is_time_locked:
+                                                 
+            raise HTTPException(
+                status_code=400,
+                detail="Время для записи занято"
+            )
+        
+        if not await self.repo.is_doctor_workay(doctor_id, appointment_date, session):
+            raise HTTPException(
+                status_code=400,
+                detail="Врач не работает в указанный день"
+            )
+        
         new_appmnt = await self.repo.create_appointment(appointment_data, session)
         return AppointmentReadDTO.model_validate(new_appmnt, from_attributes=True)
 
