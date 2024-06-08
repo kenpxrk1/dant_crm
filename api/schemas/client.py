@@ -11,7 +11,7 @@ RUSSIAN_ALPHABET_SYMBOLS = re.compile(r"^[а-яА-Яa\- ]+$")
 def check_other_symbols(value: str) -> bool:
     counter = 0
     for char in value:
-        if not (char.isalpha() or char.isspace()):
+        if not (char.isalpha() or char.isspace() or '-'):
             return False
         if char.isalpha():
             counter += 1

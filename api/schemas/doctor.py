@@ -16,6 +16,10 @@ class DoctorBaseSchema(BaseModel):
 
     @field_validator('fullname')
     def not_empty_validator(value):
+
+        """ Проверяет, что поле не является: 
+        пустой строкой, набором пробелов / доп символов  """
+
         if value == '' or value == None:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -26,6 +30,7 @@ class DoctorBaseSchema(BaseModel):
                 status_code=400,
                 detail="Имя не должно состоять только из пробелов"
             )
+            
         if check_other_symbols(value):
             return value
         else:
