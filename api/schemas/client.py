@@ -8,12 +8,46 @@ from pydantic_extra_types.phone_numbers import PhoneNumber
 
 RUSSIAN_ALPHABET_SYMBOLS = re.compile(r"^[а-яА-Яa\- ]+$")
 
+def check_other_symbols(value: str) -> bool:
+    counter = 0
+    for char in value:
+        if not (char.isalpha() or char.isspace()):
+            return False
+        if char.isalpha():
+            counter += 1
+    if counter == 0:
+        return False
+    else:
+        return True
+
+
 
 class ClientBaseSchema(BaseModel):
     fullname: str
     date_of_birth: datetime.date
     email: EmailStr
     phone_number: PhoneNumber
+
+    @field_validator('fullname')
+    def not_empty_validator(value):
+        if value == '' or value == None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Имя не должно быть пустой строкой"
+            )
+        if value.isspace():
+            raise HTTPException(
+                status_code=400,
+                detail="Имя не должно состоять только из пробелов"
+            )
+        if check_other_symbols(value):
+            return value
+        else:
+            raise HTTPException(
+                status_code=400,
+                detail="Введите корректное имя"
+            )
+        
 
     @field_validator('fullname')
     def russian_symbols_validator(value):
@@ -43,6 +77,7 @@ class ClientBaseSchema(BaseModel):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Недопустимая дата рождения"
             )
+        return value
     
     @field_validator('phone_number')
     def cut_tel_symbols(value):
