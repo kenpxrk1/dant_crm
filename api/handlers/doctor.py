@@ -11,6 +11,7 @@ from api.schemas.doctor import (
 from sqlalchemy.ext.asyncio import AsyncSession
 from api.db import db_manager
 from api.schemas.user import UserReadDTO
+from api.schemas.working_hours import WorkingHours
 
 
 
@@ -79,3 +80,14 @@ async def search_by_fio(
 ):
     doctors = await service.search_doctor_by_fio(fullname, session)
     return doctors
+
+
+@router.post("/working-hours", response_model=WorkingHours)
+async def create_working_hours(
+    wh_data: WorkingHours,
+    service: DoctorService = Depends(get_doctor_service),
+    session: AsyncSession = Depends(db_manager.get_async_session),
+    current_user: UserReadDTO = Depends(auth_service.get_current_user)
+):
+    new_wh = await service.create_working_hours(wh_data, session)
+    return new_wh

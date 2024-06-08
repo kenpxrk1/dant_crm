@@ -4,7 +4,7 @@ from fastapi import HTTPException, status
 from api.schemas.doctor import DoctorCreateDTO, DoctorReadDTO, DoctorUpdateDTO, SearchDoctorDTO
 from api.repositories.doctor import DoctorRepository
 from api.schemas.doctor import CountDoctorDTO
-
+from api.schemas.working_hours import WorkingHours
 
 class DoctorService:
     def __init__(self, repo: DoctorRepository):
@@ -50,3 +50,8 @@ class DoctorService:
             SearchDoctorDTO.model_validate(tuple_doctor, from_attributes=True)
             for tuple_doctor in tuple_doctors
         ]
+    
+    async def create_working_hours(self, data: WorkingHours, session):
+        wh_data = data.model_dump()
+        new_wh = await self.repo.create_working_hours(wh_data, session)
+        return WorkingHours.model_validate(new_wh, from_attributes=True)
