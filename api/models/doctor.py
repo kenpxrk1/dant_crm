@@ -13,7 +13,6 @@ class DoctorModel(Base):
     occupation: Mapped[str]
     vacation: Mapped[bool | None]
     phone_number: Mapped[str] = mapped_column(unique=True)
-    appointments = ...
     created_at: Mapped[datetime.datetime] = mapped_column(
         server_default=text("TIMEZONE('utc', now())")
     )
