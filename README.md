@@ -26,7 +26,7 @@ $ git clone https://github.com/kenpxrk1/quiz-task-api](https://github.com/kenpxr
 Запустите приложение из корневой папки с помощью docker-compose:
 
 ```sh
-$ docker-compose docker_compose_app up 
+$ docker-compose docker-compose up 
 ```
 
 
