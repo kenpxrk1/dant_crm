@@ -21,7 +21,7 @@ class WorkingHoursModel(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     doctor_id: Mapped[UUID] = mapped_column(
-        ForeignKey("doctors.id", ondelete="CASCADE")
+        ForeignKey("doctors.id", ondelete="CASCADE"),
         )
     day_of_week: Mapped[WeekDay]
     start_time: Mapped[dt.time] = mapped_column(default=dt.time(8, 0))
