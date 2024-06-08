@@ -41,7 +41,7 @@ services:
     env_file:
       - .env-prod
 
-    command: bash -c "alembic upgrade head; uvicorn api.main:app --host 0.0.0.0 --port 8000"
+    command: bash -c "alembic revision --autogenerate; alembic upgrade head; uvicorn api.main:app --host 0.0.0.0 --port 8000"
 
     restart: always
 
