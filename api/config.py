@@ -35,6 +35,27 @@ db_settings = DBConfig()  # DBConfig object. ! Must be single
 
 
 @dataclass
+class TestDBConfig:
+    def __init__(self) -> None:
+        self.__DB_HOST: str = os.getenv("TEST_DB_HOST")
+        self.__DB_PORT: str = os.getenv("TEST_DB_PORT")
+        self.__DB_USER: str = os.getenv("TEST_DB_USER")
+        self.__DB_PASS: str = os.getenv("TEST_DB_PASS")
+        self.__DB_NAME: str = os.getenv("TEST_DB_NAME")
+
+    @property
+    def TEST_DATABASE_URL(self) -> str:
+        """
+        Returns a string for test bd connection
+        """
+        print(f"postgresql+asyncpg://{self.__DB_USER}:{self.__DB_PASS}@{self.__DB_HOST}:{self.__DB_PORT}/{self.__DB_NAME}")
+        return f"postgresql+asyncpg://{self.__DB_USER}:{self.__DB_PASS}@{self.__DB_HOST}:{self.__DB_PORT}/{self.__DB_NAME}"
+
+
+test_db_settings = TestDBConfig()
+
+
+@dataclass
 class AuthConfig:
     """Authorization config class"""
 

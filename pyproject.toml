@@ -1,0 +1,7 @@
+[tool.pytest.ini_options]
+pythonpath = ". api"
+filterwarnings = [
+  "ignore::UserWarning",
+  "ignore::DeprecationWarning"
+]
+asyncio_mode="auto"
