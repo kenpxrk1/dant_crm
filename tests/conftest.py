@@ -97,6 +97,30 @@ async def get_user_from_database(asyncpg_pool):
 
 
 @pytest.fixture(scope='session')
+async def create_doctor_in_database(asyncpg_pool):
+    async def create_doctor_in_database(
+        id: UUID,
+        fullname: str,
+        occupation: str,
+        vacation: bool | None,
+        phone_number: str,
+        created_at: datetime.datetime
+    ):
+        async with asyncpg_pool.acquire() as connection:
+            return await connection.execute(
+                """INSERT INTO doctors VALUES ($1, $2, $3, $4, $5, $6)""",
+                id,
+                fullname,
+                occupation,
+                vacation,
+                phone_number,
+                created_at
+            )
+
+    return create_doctor_in_database
+
+
+@pytest.fixture(scope='session')
 async def create_user_in_database(asyncpg_pool):
     async def create_user_in_database(
         id: UUID,
