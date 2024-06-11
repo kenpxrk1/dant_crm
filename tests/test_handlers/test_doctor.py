@@ -60,10 +60,10 @@ async def test_create_doctors_eng_fio_error(ac: AsyncClient, create_user_in_data
 async def test_create_doctors_empty_fio_error(ac: AsyncClient, create_user_in_database, clean_tables, get_doctors, get_users):
     user_data = {
         "id": uuid4(),
-        "login": 'dagestan05@gmail.com',
+        "login": 'ivanov@gmail.com',
         'password': HashingMixin.hasher('1234'),
-        'name': 'Магомед',
-        'surname': 'Алиев',
+        'name': 'Иван',
+        'surname': 'Иванов',
         'role': 'super_user',
         'created_at': dt.datetime.now()
     }

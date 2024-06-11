@@ -77,6 +77,15 @@ async def get_doctors(asyncpg_pool):
     return get_doctors_from_db
 
 
+@pytest.fixture
+async def get_clients(asyncpg_pool):
+    async def get_clients_from_db():
+        async with asyncpg_pool.acquire() as connection:
+            return await connection.fetch("""SELECT * FROM clients""")
+
+    return get_clients_from_db
+
+
 @pytest.fixture(scope="function", autouse=True)
 async def clean_tables(asyncpg_pool):
     async def clean_tables_from_db():
@@ -118,6 +127,30 @@ async def create_doctor_in_database(asyncpg_pool):
             )
 
     return create_doctor_in_database
+
+
+@pytest.fixture(scope='session')
+async def create_client_in_database(asyncpg_pool):
+    async def create_client_in_database(
+        id: UUID,
+        fullname: str,
+        date_of_birth: datetime.date,
+        email: str,
+        phone_number: str,
+        created_at: datetime.datetime
+    ):
+        async with asyncpg_pool.acquire() as connection:
+            return await connection.execute(
+                """INSERT INTO clients VALUES ($1, $2, $3, $4, $5, $6)""",
+                id,
+                fullname,
+                date_of_birth,
+                email,
+                phone_number,
+                created_at
+            )
+
+    return create_client_in_database
 
 
 @pytest.fixture(scope='session')
